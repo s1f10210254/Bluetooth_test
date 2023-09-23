@@ -48,15 +48,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Bluetooth Example</title>
-    <script src="sensorConnector.js" defer></script> <!-- 修正したスクリプトタグ -->
+    <script src="sensorConnector.js" defer></script>
 </head>
 <body>
+    <div>
+        <h1>ケーデンスセンサーの読み取り</h1>
+        <p>
+            1.センサーに接続ボタンをクリックするとデバイス検索が入る</p>
+            2.ペア設定をクリックするとデバイスが読み取られる</p>
+            3.回転するとデータが更新されていく</p>
+
+        </p>
+    </div>
     <button onclick="connectToSensor()">センサーに接続</button>
-    <!-- <button>aaa</button> -->
-    <!-- <p>ケイデンスデータ：</p> -->
     <div id = "cadenceInfo">
         <p>ケイデンスデータ：</p>
-        <p id="canenceValue">未取得</p>
+        <div id="cadenceValue"></div>
     </div>
+
+    
+
+    <!-- <button onclick="resetRPM()">RPMリセット</button> -->
+    <span id="batteryLevel">バッテリー残量: ---%</span>
 </body>
 </html>
