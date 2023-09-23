@@ -5,11 +5,11 @@ import path from 'path';
 
 const app = express();
 
-// 以下の行を追加して、静的ファイルを適切に提供するためのミドルウェアを設定します
+// 静的ファイルを適切に提供するためのミドルウェアを設定
 app.use(express.static(path.join(__dirname)));
 
 app.get("/", (req: express.Request, res: express.Response) => {
-    res.sendFile(path.join(__dirname, "./test.html"))
+    res.sendFile(path.join(__dirname, "./test.html"));
 });
 
 const server = https.createServer(

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "typeRoots": ["./src/types", "/node_modules/@types"],
+    // "typeRoots": ["./src/types", "/node_modules/@types"],
     "jsx": "react",
 
     
