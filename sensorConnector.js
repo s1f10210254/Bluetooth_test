@@ -19,7 +19,6 @@ function resetRPM(){
         candenceDisplay.textContent = ''
     }
 }
-
 async function connectToSensor() {
     try {
         //blutoothデバイスの要求
