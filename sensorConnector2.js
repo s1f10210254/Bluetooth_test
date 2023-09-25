@@ -1,24 +1,47 @@
-// sensorConnector.js
+let cadenceValue = [];
+let timestamps = [];
 
-// 通知を受け取るためのハンドラ関数を追加
-function handleCadenceMeasurement(event) {
-    const value = event.target.value;
-    const rpm = value.getUint16(1, true); // little-endianで値を読み取る
-    console.log('Received RPM:', rpm);
-    
-    const cadenceDisplay = document.getElementById('cadenceValue');
-    if (cadenceDisplay) {
-        cadenceDisplay.textContent = `取得値: ${rpm} RPM`;
-        localStorage.removeItem('rpmValue')
+function updateData(value){
+    let now = new Date().getDate();
+
+    cadenceValue.push(value);
+    timestamps.push(now);
+
+    // 10秒以上前のデータを削除
+    while(timestamps[0] < now - 1000){
+        timestamps.shift();
+        cadenceValue.shift();
     }
 }
 
-function resetRPM(){
-    const candenceDisplay = document.getElementById('cadenceValue');
-    if(candenceDisplay){
-        candenceDisplay.textContent = ''
-    }
+//RPM計算関数の作成
+function calculateRPM(){
+    let uniqueValue = [...new Set(cadenceValue)]; //重複値の削除
+    let initialValue = uniqueValue[0];
+
+    let rotations = uniqueValue.map(value => value - initialValue); //初期値からの差を取得
+    let totalRotations = rotations.reduce((acc, cur) => acc + cur, 0);
+
+    let rpm = totalRotations /(timestamps.length / 1000); //RPM計算
+    return rpm
 }
+
+function handleCadenceMeasurement(event){
+    const value = event.target?.value;
+    if(!value){
+        console.error("No value received from characteristic");
+        return;
+    }
+
+    //受信したデータの解析や変更は必要に応じて行う
+    const cadence = value.getUint16(0,true);
+
+    updateData(cadence);
+    const currentRpm = calculateRPM();
+
+    console.log("Current RPM:" ,currentRpm);
+}
+
 async function connectToSensor() {
     try {
         //blutoothデバイスの要求
@@ -61,28 +84,8 @@ async function connectToSensor() {
         console.log("4", characteristic);
 
         // 通知を受け取るためのコードを追加
-        // characteristic.addEventListener('characteristicvaluechanged', handleCadenceMeasurement);
-        // await characteristic.startNotifications();
-
-        // // 通知を開始する（特性に変更があったときに通知を受け取るようにデバイスに指示する）
-        // await characteristic.startNotifications();
-
-        // ケイデンスの値が変わったときのイベントハンドラを設定
-        characteristic.oncharacteristicvaluechanged = (event) => {
-            const value = event.target?.value;
-            if (!value) {
-                console.error('No value received from characteristic.');
-                return;
-            }
-            console.log("Received cadence value:", value);
-            const rpm = value.getUint16(0, true); // インデックスの確認が必要です
-            const cadenceDisplay = document.getElementById('cadenceValue');
-            if (cadenceDisplay) {
-                cadenceDisplay.textContent = `取得値: ${rpm} RPM`;
-            } else {
-                console.error('cadenceValue element not found in the DOM');
-            }
-        };
+        characteristic.addEventListener('characteristicvaluechanged', handleCadenceMeasurement);
+        await characteristic.startNotifications();
         
 
         console.log("5", characteristic);
